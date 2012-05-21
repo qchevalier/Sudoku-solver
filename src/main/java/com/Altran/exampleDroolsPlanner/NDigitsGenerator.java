@@ -191,7 +191,16 @@ public class NDigitsGenerator extends LoggingMain {
     	initValue[2][8] = new Value(7);
     	initValue[6][8] = new Value(3);
     	
-    	
+		return initValue;
+    }
+    
+    private Value[][] initTabFromZero(){
+    	Value[][] initValue = new Value[9][9];
+    	for(int i =0; i < 9; i++){//column
+    		for(int j = 0; j < 9; j++){//row
+    			initValue[i][j] = new Value(0);
+    		}
+    	}
 		return initValue;
     }
 

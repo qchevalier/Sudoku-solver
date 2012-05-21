@@ -33,6 +33,7 @@ public class Value extends AbstractPersistable {
     	possibleValue = new ArrayList<Value>();
     	for (int i = 1; i < 10; i++){
     		possibleValue.add(new Value(i));
+    		
     	}
     	return possibleValue;
     }
