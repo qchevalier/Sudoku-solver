@@ -1,0 +1,61 @@
+import org.drools.planner.core.score.buildin.simple.SimpleScoreHolder;
+import org.drools.planner.core.score.constraint.UnweightedConstraintOccurrence;
+import org.drools.planner.core.score.constraint.ConstraintType;
+
+import com.Altran.exampleDroolsPlanner.Digit;
+
+global SimpleScoreHolder scoreHolder;
+
+// ############################################################################
+// Hard constraints
+// ############################################################################
+
+rule "haveToBeChanged"
+salience 1
+    when
+        $d1 : Digit(getValueValue() == 0)
+    then
+        insertLogical(new UnweightedConstraintOccurrence("haveToBeChanged", $d1));
+end
+
+rule "multipleDigitsHorizontal"
+salience 2
+    when
+        $d1 : Digit($id : id, $i : getRowIndex(), $value : getValueValue())
+        $d2 : Digit(id > $id, getRowIndex() == $i, getValueValue() == $value)
+    then
+        insertLogical(new UnweightedConstraintOccurrence("multipleDigitsHorizontal", $d1, $d2));
+end
+
+rule "multipleDigitsVertical"
+salience 2
+    when
+        $d1 : Digit($id : id, $i : getColumnIndex(), $value : getValueValue())
+        $d2 : Digit(id > $id, getColumnIndex() == $i, getValueValue() == $value)
+    then
+        insertLogical(new UnweightedConstraintOccurrence("multipleDigitsVertical", $d1, $d2));
+end
+
+rule "multipleDigitsBlock"
+salience 2
+    when
+        $d1 : Digit($id : id, $i : getBlockIndex(), $value : getValueValue())
+        $d2 : Digit(id > $id, getBlockIndex() == $i, getValueValue() == $value)
+    then
+        insertLogical(new UnweightedConstraintOccurrence("multipleDigitsBlock", $d1, $d2));
+end
+
+// ############################################################################
+// Calculate score
+// ############################################################################
+
+rule "hardConstraintsBroken"
+salience 3
+    when
+        $occurrenceCount : Number() from accumulate(
+            $unweightedConstraintOccurrence : UnweightedConstraintOccurrence(),
+            count($unweightedConstraintOccurrence)
+        )
+    then
+        scoreHolder.setScore(- $occurrenceCount.intValue());
+end

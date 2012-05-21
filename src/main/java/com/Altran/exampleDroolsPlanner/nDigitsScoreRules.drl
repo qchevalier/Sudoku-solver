@@ -1,0 +1,49 @@
+import org.drools.planner.core.score.buildin.simple.SimpleScoreHolder;
+import org.drools.planner.core.score.constraint.UnweightedConstraintOccurrence;
+import org.drools.planner.core.score.constraint.ConstraintType;
+
+import com.Altran.exampleDroolsPlanner.Digit;
+
+global SimpleScoreHolder scoreHolder;
+
+// ############################################################################
+// Hard constraints
+// ############################################################################
+
+rule "multipleDigitsHorizontal"
+    when
+        $d1 : Digit($id : id, $i : getRowIndex())
+        $d2 : Digit(id > $id, rowIndex == $i)
+    then
+        insertLogical(new UnweightedConstraintOccurrence("multipleDigitsHorizontal", $d1, $d2));
+end
+
+rule "multipleDigitsVertical"
+    when
+        $d1 : Digit($id : id, $i : getColumnIndex())
+        $d2 : Digit(id > $id, getColumnIndex() == $i)
+    then
+        insertLogical(new UnweightedConstraintOccurrence("multipleDigitsVertical", $d1, $d2));
+end
+
+rule "multipleDigitsBlock"
+    when
+        $d1 : Digit($id : id, $i : getBlockIndex())
+        $d2 : Digit(id > $id, getBlockIndex() == $i)
+    then
+        insertLogical(new UnweightedConstraintOccurrence("multipleDigitsBlock", $d1, $d2));
+end
+
+// ############################################################################
+// Calculate score
+// ############################################################################
+
+rule "hardConstraintsBroken"
+    when
+        $occurrenceCount : Number() from accumulate(
+            $unweightedConstraintOccurrence : UnweightedConstraintOccurrence(),
+            count($unweightedConstraintOccurrence)
+        )
+    then
+        scoreHolder.setScore(- $occurrenceCount.intValue());
+end
